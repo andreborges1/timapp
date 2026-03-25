@@ -4,8 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { ManualCodeInput } from "@/components/scan/ManualCodeInput";
 import { ScanResult } from "@/components/scan/ScanResult";
-import { PaymentModal } from "@/components/attendance/PaymentModal";
-import { AutoPayModal } from "@/components/attendance/AutoPayModal";
 import { EventBadge } from "@/components/events/EventBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatToronto, TORONTO_TZ } from "@/lib/utils";
@@ -41,9 +39,6 @@ export default function ScanPage() {
   const [showEventList, setShowEventList] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<ScanResultData | null>(null);
-  const [showPayment, setShowPayment] = useState(false);
-  const [showAutoPay, setShowAutoPay] = useState(false);
-  const [lastSuccess, setLastSuccess] = useState<{ userName: string; eventTitle: string } | null>(null);
 
   useEffect(() => {
     const toronto = toZonedTime(new Date(), TORONTO_TZ);
@@ -78,8 +73,6 @@ export default function ScanPage() {
         const data = await res.json();
         if (res.ok) {
           setResult({ type: "success", message: "Attendance registered!", user: data.user, event: data.event });
-          setLastSuccess({ userName: data.user.name, eventTitle: data.event.title });
-          setTimeout(() => setShowPayment(true), 2000);
         } else {
           const type = data.code === "OVERLAP_CONFLICT" ? "overlap" : data.code === "TOO_EARLY" ? "too-early" : "error";
           setResult({ type, message: data.error ?? "Registration failed." });
@@ -199,13 +192,6 @@ export default function ScanPage() {
         </Tabs>
       </div>
 
-      <PaymentModal
-        open={showPayment}
-        onClose={() => { setShowPayment(false); setTimeout(() => setShowAutoPay(true), 300); }}
-        userName={lastSuccess?.userName}
-        eventTitle={lastSuccess?.eventTitle}
-      />
-      <AutoPayModal open={showAutoPay} onClose={() => setShowAutoPay(false)} />
     </div>
   );
 }
