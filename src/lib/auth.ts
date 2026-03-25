@@ -56,6 +56,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     },
   },
+  trustHost: true,
   pages: {
     signIn: "/login",
     verifyRequest: "/login?verify=1",
