@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(dir:*)",
-      "Bash(find /c/Users/andre/Desktop/BCTIProject/timapp -type f -name *.json -o -name *.js -o -name *.ts -o -name *.tsx -o -name *.html -o -name *.xml -o -name *.yml -o -name *.yaml -o -name README* -o -name Dockerfile*)"
-    ]
-  }
-}
