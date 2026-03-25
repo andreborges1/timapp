@@ -6,14 +6,14 @@ import { verifyHostToken } from "@/lib/host-auth";
 export default async function RootPage() {
   const session = await auth();
   if (session?.user) {
-    redirect("/dashboard");
+    redirect("/profile");
   }
 
   const cookieStore = await cookies();
   const hostToken = cookieStore.get("host-token")?.value;
   if (hostToken) {
     const hostSession = await verifyHostToken(hostToken);
-    if (hostSession) redirect("/host/dashboard");
+    if (hostSession) redirect("/host/scan");
   }
 
   redirect("/login");

@@ -4,8 +4,24 @@ import Resend from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
+const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function generateShortCode(): string {
+  return Array.from({ length: 7 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join("");
+}
+
+const adapter = PrismaAdapter(prisma) as any;
+const originalCreateUser = adapter.createUser.bind(adapter);
+adapter.createUser = async (data: any) => {
+  let qrCode = generateShortCode();
+  // Ensure uniqueness
+  while (await prisma.user.findUnique({ where: { qrCode } })) {
+    qrCode = generateShortCode();
+  }
+  return originalCreateUser({ ...data, qrCode });
+};
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma) as any,
+  adapter,
   providers: [
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
@@ -34,7 +50,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
     async signIn({ user }) {
-      // Ensure the user has a name set from their email if no name provided
       if (!user.name && user.email) {
         user.name = user.email.split("@")[0];
       }

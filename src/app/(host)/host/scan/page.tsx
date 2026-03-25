@@ -11,7 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatToronto, TORONTO_TZ } from "@/lib/utils";
 import { toZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
-import { ScanLine, Keyboard, Camera } from "lucide-react";
+import { ScanLine, Keyboard, Camera, Clock, MapPin } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const QRScanner = dynamic(
   () => import("@/components/scan/QRScanner").then((m) => m.QRScanner),
@@ -51,7 +52,19 @@ export default function ScanPage() {
     const dateStr = format(toronto, "yyyy-MM-dd");
     fetch(`/api/events?date=${dateStr}`)
       .then((r) => r.json())
-      .then(setEvents);
+      .then((data) => {
+        setEvents(data);
+        // Auto-select if only one event, or the currently happening one
+        if (data.length === 1) {
+          setSelectedEventId(data[0].id);
+        } else {
+          const now = new Date();
+          const happening = data.find(
+            (e: Event) => new Date(e.startTime) <= now && new Date(e.endTime) >= now
+          );
+          if (happening) setSelectedEventId(happening.id);
+        }
+      });
   }, []);
 
   const handleScan = useCallback(
@@ -74,14 +87,11 @@ export default function ScanPage() {
             event: data.event,
           });
           setLastSuccess({ userName: data.user.name, eventTitle: data.event.title });
-          setTimeout(() => {
-            setShowPayment(true);
-          }, 2000);
+          setTimeout(() => setShowPayment(true), 2000);
         } else {
           const type =
             data.code === "OVERLAP_CONFLICT" ? "overlap" :
-            data.code === "TOO_EARLY" ? "too-early" :
-            "error";
+            data.code === "TOO_EARLY" ? "too-early" : "error";
           setResult({ type, message: data.error ?? "Registration failed." });
         }
       } finally {
@@ -92,47 +102,69 @@ export default function ScanPage() {
   );
 
   const selectedEvent = events.find((e) => e.id === selectedEventId);
+  const now = new Date();
 
   return (
-    <div className="max-w-lg space-y-6">
+    <div className="max-w-lg space-y-4">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
           <ScanLine size={22} />
           Scan Attendance
         </h1>
-        <p className="text-slate-500 text-sm">Select an event, then scan or enter the attendee's code</p>
+        <p className="text-slate-500 text-sm">Tap an event, then scan the attendee's QR code</p>
       </div>
 
-      {/* Event selector */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
-        <div>
-          <label className="text-sm font-medium text-slate-700 mb-1.5 block">Select Event *</label>
-          <select
-            value={selectedEventId}
-            onChange={(e) => setSelectedEventId(e.target.value)}
-            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2.5 bg-white text-slate-700"
-          >
-            <option value="">Choose an event to scan for...</option>
-            {events.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.title.split(" - ")[0]} — {formatToronto(new Date(e.startTime), "HH:mm")}–{formatToronto(new Date(e.endTime), "HH:mm")}
-              </option>
-            ))}
-          </select>
+      {/* Event cards */}
+      {events.length === 0 ? (
+        <div className="text-center py-8 text-slate-400 bg-white border border-dashed border-slate-200 rounded-xl text-sm">
+          No events today
         </div>
-
-        {selectedEvent && (
-          <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
-            <EventBadge type={selectedEvent.type} />
-            <span className="text-xs text-slate-500">
-              {formatToronto(new Date(selectedEvent.startTime), "HH:mm")} –{" "}
-              {formatToronto(new Date(selectedEvent.endTime), "HH:mm")}
-              {selectedEvent.location ? ` · ${selectedEvent.location}` : ""}
-            </span>
-          </div>
-        )}
-      </div>
+      ) : (
+        <div className="space-y-2">
+          {events.map((e) => {
+            const isActive = selectedEventId === e.id;
+            const isNow = new Date(e.startTime) <= now && new Date(e.endTime) >= now;
+            return (
+              <button
+                key={e.id}
+                onClick={() => setSelectedEventId(e.id)}
+                className={cn(
+                  "w-full text-left rounded-xl border-2 px-4 py-3 transition-all",
+                  isActive
+                    ? "border-blue-500 bg-blue-50 shadow-sm"
+                    : "border-slate-200 bg-white hover:border-slate-300"
+                )}
+              >
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className={cn("font-semibold text-sm truncate", isActive ? "text-blue-900" : "text-slate-800")}>
+                    {e.title.split(" - ")[0]}
+                  </span>
+                  {isNow && (
+                    <span className="shrink-0 flex items-center gap-1 text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                      Now
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 text-xs text-slate-500">
+                  <span className="flex items-center gap-1">
+                    <Clock size={11} />
+                    {formatToronto(new Date(e.startTime), "HH:mm")}–{formatToronto(new Date(e.endTime), "HH:mm")}
+                  </span>
+                  {e.location && (
+                    <span className="flex items-center gap-1 truncate">
+                      <MapPin size={11} />
+                      {e.location}
+                    </span>
+                  )}
+                  <EventBadge type={e.type} />
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Result */}
       {result && (
@@ -145,7 +177,7 @@ export default function ScanPage() {
         />
       )}
 
-      {/* Scanner — only show when event selected */}
+      {/* Scanner */}
       {selectedEventId ? (
         <div className="bg-white border border-slate-200 rounded-xl p-4">
           <Tabs defaultValue="camera">
@@ -166,7 +198,7 @@ export default function ScanPage() {
           </Tabs>
         </div>
       ) : (
-        <div className="text-center py-12 text-slate-400 bg-white border border-dashed border-slate-200 rounded-xl text-sm">
+        <div className="text-center py-10 text-slate-400 bg-white border border-dashed border-slate-200 rounded-xl text-sm">
           Select an event above to start scanning
         </div>
       )}
