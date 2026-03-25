@@ -47,6 +47,8 @@ jobs:
             root@5.161.237.132:/home/timapp/timapp/prisma/
           scp -i ~/.ssh/deploy_key prisma.config.ts \
             root@5.161.237.132:/home/timapp/timapp/
+          scp -i ~/.ssh/deploy_key public/sw.js public/workbox-*.js \
+            root@5.161.237.132:/home/timapp/timapp/public/ 2>/dev/null || true
 
       - name: Restart app
         run: |
