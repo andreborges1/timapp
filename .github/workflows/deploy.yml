@@ -45,4 +45,4 @@ jobs:
       - name: Restart app
         run: |
           ssh -i ~/.ssh/deploy_key root@5.161.237.132 \
-            "cd /home/timapp/timapp && prisma generate && pm2 restart timapp"
+            "cd /home/timapp/timapp && npx prisma generate && pm2 restart timapp"
