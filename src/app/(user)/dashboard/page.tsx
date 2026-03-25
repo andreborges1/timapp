@@ -3,6 +3,8 @@ import { TorontoClock } from "@/components/dashboard/TorontoClock";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { EventCard } from "@/components/events/EventCard";
 import { CalendarCheck, TrendingUp } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
 import { TORONTO_TZ } from "@/lib/utils";

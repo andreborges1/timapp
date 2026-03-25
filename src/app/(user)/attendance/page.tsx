@@ -5,6 +5,8 @@ import { TORONTO_TZ, formatToronto } from "@/lib/utils";
 import { EventBadge } from "@/components/events/EventBadge";
 import { CheckCircle, Calendar } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 async function getWeeklyAttendance(userId: string) {
   const nowToronto = toZonedTime(new Date(), TORONTO_TZ);
   const day = nowToronto.getDay();
@@ -63,7 +65,7 @@ export default async function AttendancePage() {
                 <CheckCircle size={16} className="text-green-600" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-slate-900 truncate">{a.event.title.split(" - ")[0]}</p>
+                <p className="font-medium text-slate-900 truncate">{a.event.title}</p>
                 <div className="flex flex-wrap items-center gap-2 mt-1">
                   <EventBadge type={a.event.type} />
                   <span className="text-xs text-slate-400">
