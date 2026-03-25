@@ -38,6 +38,8 @@ jobs:
 
       - name: Upload build to server
         run: |
+          ssh -i ~/.ssh/deploy_key root@5.161.237.132 \
+            "rm -rf /home/timapp/timapp/.next"
           tar czf - --exclude=.next/cache .next | \
             ssh -i ~/.ssh/deploy_key root@5.161.237.132 \
               "tar xzf - -C /home/timapp/timapp"
