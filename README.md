@@ -1,6 +1,6 @@
 # 🍁 TimApp — Attendance Tracker
 
-A challenge project developed for **Professor Timothy Wong**'s class. TimApp is a full-stack web application for tracking attendance at corporate events — users scan in via QR code, hosts manage events and pull reports.
+A challenge project developed for **Professor Timothy Wong**'s class. TimApp is a full-stack **Progressive Web App (PWA)** for tracking attendance at corporate events — users scan in via QR code, hosts manage events and pull reports. For the best experience testing the full flow, open the user view on your computer to display your QR code and the host view on your phone, so you can use the camera to scan it.
 
 **Live:** [andrejoaoborges.com](https://andrejoaoborges.com)
 
@@ -20,8 +20,6 @@ A challenge project developed for **Professor Timothy Wong**'s class. TimApp is 
    - **Calendar** — weekly view of events, color-coded by type, with your attendance marked
    - **Attendance** — your full attendance history
    - **Dashboard** — summary stats
-
-> **Tip:** Open the app as a user on your computer to display your QR code, and follow the host steps on your phone so you can use the camera as a scanner.
 
 ---
 
