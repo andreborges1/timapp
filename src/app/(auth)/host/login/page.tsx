@@ -33,7 +33,7 @@ async function loginAction(formData: FormData) {
     maxAge: 8 * 60 * 60,
   });
 
-  redirect("/host/dashboard");
+  redirect("/host/scan");
 }
 
 export default function HostLoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {

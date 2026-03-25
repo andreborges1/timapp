@@ -13,7 +13,6 @@ export function HostLoginForm() {
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit() {
-    alert("clicou");
     const email = (document.getElementById("host-email") as HTMLInputElement)?.value ?? "";
     const password = (document.getElementById("host-password") as HTMLInputElement)?.value ?? "";
     if (!email || !password) {
@@ -33,7 +32,7 @@ export function HostLoginForm() {
         return;
       }
       toast.success(`Welcome back, ${data.host.name}!`);
-      router.push("/host/dashboard");
+      router.push("/host/scan");
       router.refresh();
     } catch {
       toast.error("Connection error. Please try again.");
