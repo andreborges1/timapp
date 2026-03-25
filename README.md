@@ -1,36 +1,157 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍁 TimApp — Attendance Tracker
 
-## Getting Started
+A challenge project developed for **Professor Timothy Wong**'s class. TimApp is a full-stack web application for tracking attendance at corporate events — users scan in via QR code, hosts manage events and pull reports.
 
-First, run the development server:
+**Live:** [andrejoaoborges.com](https://andrejoaoborges.com)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## How to Use
+
+### As a User (attendee)
+
+1. Go to [andrejoaoborges.com](https://andrejoaoborges.com) and sign in with Google or a magic link sent to your email.
+2. After login you land directly on your **QR Code** page — a personal 7-character code unique to your account.
+3. Show the QR code to the host to register your attendance at an event.
+4. Use the bottom navigation to explore:
+   - **Profile** — your QR code
+   - **Calendar** — weekly view of events, color-coded by type, with your attendance marked
+   - **Attendance** — your full attendance history
+   - **Dashboard** — summary stats
+
+> **Tip:** The user experience is optimized for desktop/laptop. Open it on a computer, find your QR code, and let the host scan it with their phone.
+
+---
+
+### As a Host
+
+1. Go to [andrejoaoborges.com/host/login](https://andrejoaoborges.com/host/login) and sign in with your host credentials.
+2. You land on the **Scan** page — select the active event and point the camera at a user's QR code to register their attendance.
+3. If the camera isn't convenient, switch to the **Manual** tab and type in the 7-character code directly.
+
+> **Tip:** The host interface is optimized for mobile. Use your phone as a scanner — the camera tab is front and center.
+
+**Host portal sections:**
+
+| Section | What it does |
+|---|---|
+| **Scan** | QR camera scanner + manual code entry. Auto-selects the currently active event. |
+| **Events** | Browse events by day, filter by type, create new events. |
+| **Reports** | Export an Excel workbook with 6 sheets of attendance analytics for any date range. |
+| **Dashboard** | Overview stats — total events, total check-ins, active users. |
+
+---
+
+### Excel Report Sheets
+
+When you export from the Reports page, the `.xlsx` file includes:
+
+1. **All Events** — every event in the date range with attendance count
+2. **By Event Type** — totals per type (Meeting, Interview, Workshop, Training, Conference, Other)
+3. **By Day of Week** — attendance distribution Mon–Sat
+4. **By Hour of Day** — hourly distribution 8am–9pm to identify peak times
+5. **Top 10 Events** — the 10 most attended events in the period
+6. **Daily Trend** — total attendances per calendar day
+
+---
+
+## Project Structure
+
+```
+timapp/
+├── prisma/
+│   ├── schema.prisma        # Database schema (User, Host, Event, Attendance)
+│   ├── seed.ts              # Seeds hosts, 25 sample users, and a week of events
+│   └── prod.db              # SQLite production database (on server)
+│
+├── src/
+│   ├── app/
+│   │   ├── (auth)/          # Public auth pages: /login, /host/login
+│   │   ├── (user)/          # Protected user pages: profile, calendar, attendance, dashboard
+│   │   ├── (host)/          # Protected host pages: scan, events, reports, dashboard
+│   │   └── api/             # REST API routes: attendance, events, reports, host auth
+│   │
+│   ├── components/
+│   │   ├── auth/            # Login forms (user + host)
+│   │   ├── events/          # Event cards, badges, weekly calendar
+│   │   ├── scan/            # QR scanner (ZXing), manual code input, result display
+│   │   ├── profile/         # QR code display (react-qr-code)
+│   │   ├── layout/          # Bottom nav (user), sidebar (host)
+│   │   └── ui/              # shadcn/ui components
+│   │
+│   └── lib/
+│       ├── auth.ts          # NextAuth config (Google + Resend magic link)
+│       ├── host-auth.ts     # JWT-based host session (jose)
+│       ├── prisma.ts        # Prisma client singleton
+│       └── utils.ts         # Toronto timezone helpers, event type constants
+│
+├── .github/
+│   └── workflows/
+│       └── deploy.yml       # CI/CD pipeline
+│
+└── public/
+    ├── icons/               # PWA icons (SVG + PNG)
+    └── manifest.json        # PWA manifest
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router, React 19) |
+| Auth | NextAuth v5 — Google OAuth + Resend magic link (users), JWT cookies (hosts) |
+| Database | SQLite via Prisma + better-sqlite3 |
+| Styling | Tailwind CSS v4 + shadcn/ui |
+| QR Scanning | ZXing browser library |
+| QR Generation | react-qr-code |
+| Excel Export | xlsx (SheetJS) |
+| Email | Resend |
+| PWA | @ducanh2912/next-pwa |
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The app runs on a **Hetzner VPS** (2 vCPU, 2 GB RAM) served via **nginx** with **Let's Encrypt SSL** and kept alive with **PM2**.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+CI/CD is handled by **GitHub Actions** (free, unlimited for public repos). On every push to `main`:
 
-## Deploy on Vercel
+1. Installs dependencies and generates the Prisma client
+2. Builds the Next.js app on the Actions runner (which has AVX2 — the server CPU does not, so builds must happen off-server)
+3. SSHes into the server, wipes the old `.next` directory, and extracts the fresh build
+4. Restarts the app with PM2
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The database is SQLite and lives on the server's disk. It is not touched on deploy.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Running Locally
+
+```bash
+npm install
+npx prisma generate
+npx prisma db push
+npm run seed     # creates hosts, sample users, and a week of events
+npm run dev
+```
+
+Create a `.env.local` file with:
+
+```env
+AUTH_SECRET=your-random-secret
+AUTH_GOOGLE_ID=your-google-client-id
+AUTH_GOOGLE_SECRET=your-google-client-secret
+RESEND_API_KEY=your-resend-api-key
+EMAIL_FROM=noreply@yourdomain.com
+DATABASE_URL=file:./prisma/dev.db
+NEXTAUTH_URL=http://localhost:3000
+AUTH_TRUST_HOST=true
+```
+
+---
+
+## Author
+
+Built by **André Borges** as a challenge project for the BCTI program.
