@@ -41,6 +41,10 @@ jobs:
           tar czf - --exclude=.next/cache .next | \
             ssh -i ~/.ssh/deploy_key root@5.161.237.132 \
               "tar xzf - -C /home/timapp/timapp"
+          scp -i ~/.ssh/deploy_key prisma/seed.ts prisma.config.ts \
+            root@5.161.237.132:/home/timapp/timapp/prisma/
+          scp -i ~/.ssh/deploy_key prisma.config.ts \
+            root@5.161.237.132:/home/timapp/timapp/
 
       - name: Restart app
         run: |
