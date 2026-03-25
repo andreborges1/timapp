@@ -30,14 +30,14 @@ export function AttendancePoller({ userName }: { userName?: string }) {
         const data = await res.json();
         const attendance: LatestAttendance | null = data.attendance;
 
-        if (!attendance) return;
-
         // On first poll, just record the current latest — don't trigger modal
         if (!initializedRef.current) {
-          lastSeenIdRef.current = attendance.id;
+          lastSeenIdRef.current = attendance?.id ?? null;
           initializedRef.current = true;
           return;
         }
+
+        if (!attendance) return;
 
         // New attendance detected
         if (attendance.id !== lastSeenIdRef.current) {
