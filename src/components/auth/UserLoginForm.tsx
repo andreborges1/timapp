@@ -20,7 +20,7 @@ export function UserLoginForm({ verifyMode }: Props) {
 
   async function handleGoogleLogin() {
     setLoading(true);
-    await signIn("google", { callbackUrl: "/dashboard" });
+    await signIn("google", { callbackUrl: "/profile" });
   }
 
   async function handleEmailLogin(e: React.FormEvent) {
@@ -28,7 +28,7 @@ export function UserLoginForm({ verifyMode }: Props) {
     if (!email) return;
     setLoading(true);
     try {
-      const res = await signIn("resend", { email, redirect: false, callbackUrl: "/dashboard" });
+      const res = await signIn("resend", { email, redirect: false, callbackUrl: "/profile" });
       if (res?.error) {
         toast.error("Failed to send magic link. Please try again.");
       } else {

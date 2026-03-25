@@ -13,50 +13,36 @@ export default async function ProfilePage() {
   const session = await auth();
   const user = await prisma.user.findUnique({
     where: { id: session!.user.id },
-    select: { id: true, name: true, email: true, image: true, qrCode: true, createdAt: true },
+    select: { id: true, name: true, email: true, image: true, qrCode: true },
   });
 
   if (!user) return null;
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Profile</h1>
-        <p className="text-slate-500 text-sm">Your identity and QR code</p>
+    <div className="max-w-md mx-auto px-4 py-6 space-y-5">
+      {/* QR Code — first and prominent */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col items-center gap-3">
+        <QRCodeDisplay value={user.qrCode} size={240} />
+        <p className="text-xs text-slate-400 text-center">
+          Show this to the host to register your attendance
+        </p>
       </div>
 
-      {/* User info card */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center gap-4">
-        <Avatar className="w-16 h-16">
+      {/* User info */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3">
+        <Avatar className="w-12 h-12 shrink-0">
           <AvatarImage src={user.image ?? undefined} />
-          <AvatarFallback className="text-xl bg-slate-100">
-            {user.name?.charAt(0) ?? <User size={24} />}
+          <AvatarFallback className="bg-slate-100">
+            {user.name?.charAt(0) ?? <User size={18} />}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <p className="text-lg font-bold text-slate-900 truncate">{user.name}</p>
-          <p className="flex items-center gap-1 text-sm text-slate-500 truncate">
-            <Mail size={13} />
+          <p className="font-semibold text-slate-900 truncate">{user.name}</p>
+          <p className="flex items-center gap-1 text-xs text-slate-500 truncate">
+            <Mail size={11} />
             {user.email}
           </p>
         </div>
-      </div>
-
-      {/* QR Code section */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5">
-        <h2 className="text-base font-semibold text-slate-900 mb-1">Your QR Code</h2>
-        <p className="text-sm text-slate-500 mb-5">
-          Show this QR code to the event host to register your attendance.
-        </p>
-        <QRCodeDisplay value={user.qrCode} size={220} />
-      </div>
-
-      {/* Hint */}
-      <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-        <p className="text-sm text-blue-700">
-          <strong>Tip:</strong> You can also find your unique code below the QR image.
-          The host can type it manually if the camera isn't working.
-        </p>
       </div>
 
       {/* Logout */}
