@@ -13,6 +13,7 @@ export function QRScanner({ onScan, active = true }: QRScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
+  const cooldownRef = useRef(false);
 
   useEffect(() => {
     if (!active) return;
@@ -24,9 +25,11 @@ export function QRScanner({ onScan, active = true }: QRScannerProps) {
         setError(null);
         setScanning(true);
         await reader.decodeFromVideoDevice(undefined, videoRef.current!, (result, err) => {
-          if (stopped) return;
+          if (stopped || cooldownRef.current) return;
           if (result) {
+            cooldownRef.current = true;
             onScan(result.getText());
+            setTimeout(() => { cooldownRef.current = false; }, 3000);
           }
         });
       } catch (e: any) {

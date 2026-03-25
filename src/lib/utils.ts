@@ -43,7 +43,8 @@ export function nowInToronto(): Date {
 
 export function formatToronto(date: Date | string, fmt: string): string {
   const d = typeof date === "string" ? new Date(date) : date;
-  return format(d, fmt, { timeZone: TORONTO_TZ });
+  const zonedDate = toZonedTime(d, TORONTO_TZ);
+  return format(zonedDate, fmt, { timeZone: TORONTO_TZ });
 }
 
 export function toTorontoDate(date: Date | string): Date {
