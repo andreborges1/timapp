@@ -154,4 +154,4 @@ AUTH_TRUST_HOST=true
 
 ## Author
 
-Built by **André Borges** as a challenge project for the BCTI program.
+Built by **André Borges** for the **Cybersecurity Capstone Project — CSAI-5505-0NA** course.
