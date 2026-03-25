@@ -19,7 +19,7 @@ A challenge project developed for **Professor Timothy Wong**'s class. TimApp is 
    - **Attendance** — your full attendance history
    - **Dashboard** — summary stats
 
-> **Tip:** The user experience is optimized for desktop/laptop. Open it on a computer, find your QR code, and let the host scan it with their phone.
+> **Tip:** Open the app as a user on your computer to display your QR code, and follow the host steps on your phone so you can use the camera as a scanner.
 
 ---
 
@@ -28,8 +28,6 @@ A challenge project developed for **Professor Timothy Wong**'s class. TimApp is 
 1. Go to [andrejoaoborges.com/host/login](https://andrejoaoborges.com/host/login) and sign in with your host credentials.
 2. You land on the **Scan** page — select the active event and point the camera at a user's QR code to register their attendance.
 3. If the camera isn't convenient, switch to the **Manual** tab and type in the 7-character code directly.
-
-> **Tip:** The host interface is optimized for mobile. Use your phone as a scanner — the camera tab is front and center.
 
 **Host portal sections:**
 
