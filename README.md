@@ -4,6 +4,8 @@ A challenge project developed for **Professor Timothy Wong**'s class. TimApp is 
 
 **Live:** [andrejoaoborges.com](https://andrejoaoborges.com)
 
+> **Note:** The app is pre-loaded with sample data — a set of realistic events spread across the current week, plus 25 mock users with attendance history — so you can explore all features right away without setting anything up.
+
 ---
 
 ## How to Use
@@ -25,7 +27,11 @@ A challenge project developed for **Professor Timothy Wong**'s class. TimApp is 
 
 ### As a Host
 
-1. Go to [andrejoaoborges.com/host/login](https://andrejoaoborges.com/host/login) and sign in with your host credentials.
+> **Demo credentials**
+> **Email:** `host@example.com`
+> **Password:** `password123`
+
+1. Go to [andrejoaoborges.com/host/login](https://andrejoaoborges.com/host/login) and sign in with the credentials above.
 2. You land on the **Scan** page — select the active event and point the camera at a user's QR code to register their attendance.
 3. If the camera isn't convenient, switch to the **Manual** tab and type in the 7-character code directly.
 
